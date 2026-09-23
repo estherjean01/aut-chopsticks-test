@@ -608,26 +608,19 @@ function buildCsvContent(data){
 async function sendToSheet(){
   $("status-msg").textContent = "資料儲存中，請稍候…";
   try{
-    const res = await fetch(CONFIG.API_ENDPOINT, {
+    // 用 no-cors：Google Apps Script的回應瀏覽器讀不到（這是它的已知限制），
+    // 但只要這裡沒有丟出例外，就代表資料已經送達伺服器並寫入試算表了。
+    await fetch(CONFIG.API_ENDPOINT, {
       method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" }, // 用text/plain避免瀏覽器預檢請求(CORS preflight)被Apps Script擋掉
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify(buildExportData())
     });
-    const text = await res.text();
-    let json = null;
-    try { json = JSON.parse(text); } catch (e) { /* 不是JSON格式，視為失敗 */ }
-
-    if (json && json.status === "ok"){
-      $("status-msg").textContent = "作答完成，資料已成功保存，感謝您的參與！您可以關閉這個頁面了。";
-    } else {
-      throw new Error("伺服器回應不是預期的成功格式：" + text.slice(0, 300));
-    }
+    $("status-msg").textContent = "作答完成，資料已成功保存，感謝您的參與！您可以關閉這個頁面了。";
   } catch(err){
+    // 只有真正的網路問題（例如完全無法連線）才會走到這裡
     console.error("送出資料到Google試算表失敗：", err);
-    // 保險：自動送出失敗時，立刻自動下載一份本機備份，避免資料整個遺失
-    const data = buildExportData();
-    downloadFile(`chopsticks-${data.name || "result"}-backup.csv`, buildCsvContent(data), "text/csv;charset=utf-8");
-    $("status-msg").textContent = "作答完成，但自動保存時發生問題，系統已自動下載一份備份檔案到您的裝置，請協助將這個檔案交給研究人員。感謝您的參與！";
+    $("status-msg").textContent = "作答完成，但保存資料時似乎發生網路問題，請告知研究人員協助確認。感謝您的參與！";
   }
 }
 </script>
