@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>竹筷子的不尋常用途 — 創意測驗（逐題版）</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&display=swap');
+
+  :root{
+    --paper: #FBF9F3;
+    --desk: #EDE8DA;
+    --ink: #2B2A28;
+    --ink-soft: #6b6558;
+    --rule: #C9C2B0;
+    --accent: #2F4B7C;
+    --accent-soft: #E6ECF3;
+    --warn: #A6402F;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--desk);
+    color: var(--ink);
+    font-family: -apple-system, "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+    display:flex;
+    justify-content:center;
+    padding: 32px 16px 80px;
+  }
+  .sheet{
+    background: var(--paper);
+    width: 100%;
+    max-width: 720px;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    box-shadow: 0 1px 2px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.08);
+    padding: 40px 44px;
+    position: relative;
+  }
+  h1{
+    font-family:"Noto Serif TC", serif;
+    font-weight:700;
+    font-size: 1.5rem;
+    letter-spacing: .02em;
+    margin: 0 0 4px;
+  }
+  .subtitle{ color: var(--ink-soft); font-size: .92rem; margin-bottom: 28px; }
+  p{ margin: 0 0 14px; font-size: .98rem; }
+  .task-text{
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+    padding: 16px 20px;
+    border-radius: 2px;
+    font-size: .95rem;
+    color: #1f2f45;
+    margin-bottom: 24px;
+  }
+  .task-text strong{ font-weight:700; }
+
+  label{ display:block; font-size: .85rem; color: var(--ink-soft); margin-bottom: 6px; }
+  .field{ margin-bottom: 18px; }
+  input[type=text], input[type=number], select{
+    width:100%;
+    font-size: 1rem;
+    font-family: inherit;
+    color: var(--ink);
+    background: transparent;
+    border: none;
+    border-bottom: 1.5px solid var(--rule);
+    padding: 6px 2px;
+  }
+  input:focus, select:focus{
+    outline:none;
+    border-bottom-color: var(--accent);
+  }
+  .row2{ display:flex; gap: 24px; }
+  .row2 > div{ flex:1; }
+
+  .error-banner{
+    background: #F7E4E1;
+    border-left: 3px solid var(--warn);
+    color: var(--warn);
+    padding: 12px 16px;
+    border-radius: 2px;
+    font-size: .85rem;
+    margin-bottom: 20px;
+  }
+  .field-error{ border-bottom-color: var(--warn) !important; }
+  .device-options{
+    display:flex;
+    flex-wrap: wrap;
+    gap: 22px;
+    align-items:center;
+    padding: 6px 2px 10px;
+  }
+  .device-options.field-error-group{
+    outline: 1.5px solid var(--warn);
+    outline-offset: 6px;
+    border-radius: 2px;
+  }
+  .device-options label{
+    display:flex;
+    align-items:center;
+    gap: 6px;
+    font-size: .95rem;
+    color: var(--ink);
+    cursor:pointer;
+    margin-bottom:0;
+  }
+  .device-options input[type=radio]{
+    accent-color: var(--accent);
+    width:16px; height:16px;
+  }
+  #f-device-other{
+    width: 150px;
+    border-bottom: 1.5px solid var(--rule);
+    padding: 2px 2px 4px;
+    margin-left: 2px;
+  }
+
+  button{
+    font-family: inherit;
+    font-size: .95rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 2px;
+    padding: 12px 22px;
+    cursor: pointer;
+    transition: background .15s ease;
+  }
+  .btn-primary{ background: var(--accent); color:#fff; }
+  .btn-primary:hover{ background:#25395e; }
+  .btn-secondary{ background:transparent; color: var(--accent); border:1.5px solid var(--accent); }
+  .btn-secondary:hover{ background: var(--accent-soft); }
+  .btn-primary:disabled{ background:#a9b4c4; cursor:not-allowed; }
+  .actions{ margin-top: 28px; display:flex; gap:12px; }
+
+  /* --- timer --- */
+  .timer-bar{
+    position: sticky;
+    top: 0;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background: var(--paper);
+    border-bottom: 1px solid var(--rule);
+    padding: 10px 0 14px;
+    margin-bottom: 18px;
+    z-index: 5;
+  }
+  .timer{
+    font-variant-numeric: tabular-nums;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .timer.low{ color: var(--warn); }
+  .timer-label{ font-size: .78rem; color: var(--ink-soft); }
+
+  /* --- sequential question view --- */
+  .progress-track{
+    height: 4px;
+    background: var(--rule);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 26px;
+  }
+  .progress-fill{
+    height: 100%;
+    background: var(--accent);
+    transition: width .25s ease;
+  }
+  .qnum-big{
+    font-family: "Noto Serif TC", serif;
+    font-size: 1rem;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+  }
+  .qnum-big strong{
+    font-size: 1.5rem;
+    color: var(--ink);
+    font-weight: 700;
+  }
+  #q-current-input{
+    font-size: 1.25rem;
+    padding: 14px 4px;
+    border-bottom: 2px solid var(--rule);
+    margin-bottom: 26px;
+  }
+  #q-current-input:focus{ border-bottom-color: var(--accent); }
+  .qhint{ font-size: .8rem; color: var(--ink-soft); margin-top: -18px; margin-bottom: 24px; }
+  #last-recorded{
+    margin-top: 0;
+    margin-bottom: 16px;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* --- results --- */
+  table{ width:100%; border-collapse: collapse; font-size: .88rem; margin-top: 8px; }
+  th, td{ text-align:left; padding: 7px 6px; border-bottom: 1px solid var(--rule); }
+  th{ color: var(--ink-soft); font-weight:600; font-size:.78rem; }
+  .empty-cell{ color: var(--ink-soft); font-style: italic; }
+  .note{ font-size: .82rem; color: var(--ink-soft); margin-top: 18px; }
+
+  [hidden]{ display:none !important; }
+</style>
+</head>
+<body>
+
+<div class="sheet">
+
+  <!-- SCREEN 1: basic info -->
+  <section id="screen-intro">
+    <h1>竹筷子的不尋常用途</h1>
+    <div class="subtitle">創意測驗（逐題版） · 開始前請先填寫基本資料</div>
+
+    <div class="error-banner" id="intro-error" hidden></div>
+
+    <div class="field">
+      <label for="f-name">姓名</label>
+      <input type="text" id="f-name" placeholder="請輸入姓名">
+    </div>
+    <div class="field">
+      <label for="f-student-id">學號（選填）</label>
+      <input type="text" id="f-student-id" placeholder="請輸入學號">
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label for="f-gender">性別</label>
+        <select id="f-gender">
+          <option value="">請選擇</option>
+          <option value="男">男</option>
+          <option value="女">女</option>
+          <option value="不透露">不透露</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="f-age">年齡</label>
+        <input type="number" id="f-age" placeholder="例如：10">
+      </div>
+    </div>
+    <div class="field">
+      <label for="f-class">年級 / 班級</label>
+      <input type="text" id="f-class" placeholder="例如：五年二班">
+    </div>
+
+    <div class="field">
+      <label>作答裝置</label>
+      <div class="device-options" id="device-group">
+        <label><input type="radio" name="device" value="電腦"> 電腦</label>
+        <label><input type="radio" name="device" value="手機"> 手機</label>
+        <label>
+          <input type="radio" name="device" value="其他">
+          其他：<input type="text" id="f-device-other" placeholder="請說明">
+        </label>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn-primary" id="btn-to-instructions">下一步</button>
+    </div>
+  </section>
+
+  <!-- SCREEN 2: how to operate (not timed) -->
+  <section id="screen-howto" hidden>
+    <h1>操作說明</h1>
+    <div class="subtitle">正式測驗開始前，先了解一下畫面怎麼操作（這一頁不計時，可以慢慢看）</div>
+
+    <div class="task-text">
+      <p>1. 每次畫面只會出現「一題」空格，看到題目後直接在空格內打字輸入答案。</p>
+      <p>2. 打完一個答案後，按鍵盤的 <strong>Enter</strong>，或按畫面上的「<strong>下一題</strong>」按鈕，系統就會記下這一題花的時間，並自動換到下一題。</p>
+      <p>3. 送出之後<strong>沒辦法回到上一題修改</strong>，請確認寫好再送出。</p>
+      <p>4. 正式開始作答後，畫面上方會有 <strong>10分鐘倒數計時</strong>；時間一到，系統會自動收卷，不需要按任何按鈕。</p>
+      <p style="margin-bottom:0;">5. 如果題目還沒答完但想先結束，也可以按「提前交卷」。</p>
+    </div>
+
+    <div class="actions">
+      <button class="btn-secondary" id="btn-back-intro-from-howto">上一步</button>
+      <button class="btn-primary" id="btn-howto-to-instructions">下一步</button>
+    </div>
+  </section>
+
+  <!-- SCREEN 3: instructions -->
+  <section id="screen-instructions" hidden>
+    <h1>竹筷子的不尋常用途</h1>
+    <div class="subtitle">測驗說明</div>
+
+    <div class="task-text">
+      <p>筷子和我們日常生活關係太密切了！筷子除了吃飯夾菜夾肉等食物外，當然也可以加其他的東西。筷子除了夾食物的功能以外，一定還有其他各種不同甚至有創意的用途，這個測驗的目的就是請你想想筷子還有哪些功能？請你將所想到的用途分別寫在畫線處，每一個畫線處寫一個用途，您所能想到的用途愈多愈好，每個用途寫的愈清楚愈具體愈好。</p>
+      <p style="margin-bottom:0;"><strong>記住：</strong>你只能用竹子做的筷子而且這些筷子的長短跟我們平常家裡吃飯用的差不多，你可以同時使用很多枝或很多雙筷子。（<strong>十分鐘</strong>）</p>
+    </div>
+
+    <div class="actions">
+      <button class="btn-secondary" id="btn-back-howto">上一步</button>
+      <button class="btn-primary" id="btn-start-test">開始測驗（開始倒數10分鐘）</button>
+    </div>
+  </section>
+
+  <!-- SCREEN 3: test (one question at a time) -->
+  <section id="screen-test" hidden>
+    <div class="timer-bar">
+      <div>
+        <div class="timer-label">剩餘時間</div>
+        <div class="timer" id="timer-display">10:00</div>
+      </div>
+      <button class="btn-secondary" id="btn-finish-early">提前交卷</button>
+    </div>
+
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+
+    <div class="qnum-big">第 <strong id="q-current-num">1</strong> / 22 題</div>
+    <div class="qhint" id="last-recorded" hidden></div>
+    <input type="text" id="q-current-input" autocomplete="off" placeholder="寫下一個用途…">
+    <p class="qhint">按 Enter 或「下一題」送出這一題並前進到下一格。</p>
+
+    <div class="actions">
+      <button class="btn-primary" id="btn-next-question">下一題</button>
+    </div>
+  </section>
+
+  <!-- SCREEN 4: results -->
+  <section id="screen-results" hidden>
+    <h1>作答結果</h1>
+    <div class="subtitle" id="results-subtitle"></div>
+    <table>
+      <thead>
+        <tr><th style="width:36px;">題號</th><th>答案</th><th style="width:110px;">作答用時</th></tr>
+      </thead>
+      <tbody id="results-body"></tbody>
+    </table>
+
+    <p class="note" id="status-msg" style="margin-top:24px; font-size:.95rem;">資料儲存中，請稍候…</p>
+  </section>
+
+</div>
+
+<script>
+/* ============================================================
+   設定區：如果想自動把資料送進 Google 試算表，
+   把 Google Apps Script Web App 的網址貼在下面即可。
+   留空就只能用下載 CSV / JSON 的方式保存資料。
+   ============================================================ */
+const CONFIG = {
+  API_ENDPOINT: "" // 例如: "https://script.google.com/macros/s/xxxx/exec"
+};
+
+const TOTAL_ITEMS = 22;
+const TEST_SECONDS = 10 * 60;
+
+let testStartTime = null;
+let timerInterval = null;
+let remaining = TEST_SECONDS;
+let currentIndex = 0;
+let questionShownAt = null;
+const answers = Array.from({length: TOTAL_ITEMS}, () => ({ text: "", elapsedMs: null, recordedAt: null }));
+
+const $ = (id) => document.getElementById(id);
+
+function show(id){
+  ["screen-intro","screen-howto","screen-instructions","screen-test","screen-results"].forEach(s => {
+    $(s).hidden = (s !== id);
+  });
+}
+
+// --- Screen 1 -> 2 (howto) ---
+$("btn-to-instructions").addEventListener("click", () => {
+  const missing = validateIntro();
+  if (missing.length > 0){
+    showIntroError(missing);
+    return;
+  }
+  $("intro-error").hidden = true;
+  show("screen-howto");
+});
+
+// --- Screen 2 (howto) -> 1 / 3 ---
+$("btn-back-intro-from-howto").addEventListener("click", () => show("screen-intro"));
+$("btn-howto-to-instructions").addEventListener("click", () => show("screen-instructions"));
+
+// --- Screen 3 (task instructions) -> 2 ---
+$("btn-back-howto").addEventListener("click", () => show("screen-howto"));
+
+function validateIntro(){
+  const missing = [];
+  const checks = [
+    { id: "f-name", label: "姓名" },
+    { id: "f-gender", label: "性別" },
+    { id: "f-age", label: "年齡" },
+    { id: "f-class", label: "年級/班級" }
+  ];
+  checks.forEach(c => {
+    const el = $(c.id);
+    const val = el.value.trim();
+    el.classList.toggle("field-error", !val);
+    if (!val) missing.push(c.label);
+  });
+
+  const deviceRadio = document.querySelector('input[name="device"]:checked');
+  const deviceGroup = $("device-group");
+  if (!deviceRadio){
+    deviceGroup.classList.add("field-error-group");
+    missing.push("作答裝置");
+  } else {
+    deviceGroup.classList.remove("field-error-group");
+    if (deviceRadio.value === "其他"){
+      const otherVal = $("f-device-other").value.trim();
+      $("f-device-other").classList.toggle("field-error", !otherVal);
+      if (!otherVal) missing.push("其他裝置說明");
+    } else {
+      $("f-device-other").classList.remove("field-error");
+    }
+  }
+  return missing;
+}
+
+function showIntroError(missing){
+  const banner = $("intro-error");
+  banner.hidden = false;
+  banner.textContent = "請完成以下欄位：" + missing.join("、");
+}
+
+function getDeviceValue(){
+  const deviceRadio = document.querySelector('input[name="device"]:checked');
+  if (!deviceRadio) return "";
+  if (deviceRadio.value === "其他"){
+    return "其他：" + $("f-device-other").value.trim();
+  }
+  return deviceRadio.value;
+}
+
+// 開始打字/選擇後，立刻移除紅色錯誤提示
+["f-name","f-gender","f-age","f-class","f-device-other"].forEach(id => {
+  $(id).addEventListener("input", () => $(id).classList.remove("field-error"));
+  $(id).addEventListener("change", () => $(id).classList.remove("field-error"));
+});
+document.querySelectorAll('input[name="device"]').forEach(r => {
+  r.addEventListener("change", () => $("device-group").classList.remove("field-error-group"));
+});
+
+// --- Screen 3 (task instructions) -> 4 (test) ---
+$("btn-start-test").addEventListener("click", () => {
+  show("screen-test");
+  startTimer();
+  renderCurrentQuestion();
+  $("q-current-input").focus();
+});
+
+function renderCurrentQuestion(){
+  $("q-current-num").textContent = currentIndex + 1;
+  $("progress-fill").style.width = Math.round((currentIndex / TOTAL_ITEMS) * 100) + "%";
+  $("q-current-input").value = "";
+  questionShownAt = Date.now(); // 這一題的計時從「現在顯示出來」開始算，不是從測驗開始算
+}
+
+$("q-current-input").addEventListener("keydown", (e) => {
+  if (e.key === "Enter"){
+    e.preventDefault();
+    advanceQuestion();
+  }
+});
+$("btn-next-question").addEventListener("click", advanceQuestion);
+
+function advanceQuestion(){
+  const elapsedMs = recordAnswer(currentIndex, $("q-current-input").value);
+  showLastRecorded(currentIndex, elapsedMs);
+  currentIndex++;
+  if (currentIndex >= TOTAL_ITEMS){
+    clearInterval(timerInterval);
+    finishTest();
+  } else {
+    renderCurrentQuestion();
+    $("q-current-input").focus();
+  }
+}
+
+function showLastRecorded(i, elapsedMs){
+  const el = $("last-recorded");
+  el.hidden = false;
+  el.textContent = `第 ${i + 1} 題已記錄 · 用時 ${formatElapsed(elapsedMs)}`;
+}
+
+function recordAnswer(i, val){
+  const elapsedMs = Date.now() - questionShownAt; // 這一題自己花的時間，不是累積時間
+  answers[i] = { text: val, elapsedMs, recordedAt: new Date().toISOString() };
+  return elapsedMs;
+}
+
+function formatElapsed(ms){
+  const s = Math.floor(ms / 1000);
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return m + ":" + String(sec).padStart(2, "0");
+}
+
+function startTimer(){
+  testStartTime = Date.now();
+  remaining = TEST_SECONDS;
+  updateTimerDisplay();
+  timerInterval = setInterval(() => {
+    remaining--;
+    updateTimerDisplay();
+    if (remaining <= 0){
+      clearInterval(timerInterval);
+      // 時間到：把目前這一格還沒送出的內容也記錄下來
+      recordAnswer(currentIndex, $("q-current-input").value);
+      finishTest();
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay(){
+  const m = Math.floor(remaining / 60);
+  const s = remaining % 60;
+  const el = $("timer-display");
+  el.textContent = m + ":" + String(s).padStart(2, "0");
+  el.classList.toggle("low", remaining <= 60);
+}
+
+$("btn-finish-early").addEventListener("click", () => {
+  if (confirm("確定要提前交卷嗎？")){
+    clearInterval(timerInterval);
+    recordAnswer(currentIndex, $("q-current-input").value);
+    finishTest();
+  }
+});
+
+function finishTest(){
+  renderResults();
+  show("screen-results");
+  if (CONFIG.API_ENDPOINT){
+    sendToSheet();
+  } else {
+    // 保險：完全沒設定上傳網址時，至少自動幫他下載一份本機備份
+    const data = buildExportData();
+    downloadFile(`chopsticks-${data.name || "result"}.csv`, buildCsvContent(data), "text/csv;charset=utf-8");
+    $("status-msg").textContent = "作答完成，尚未設定自動保存網址，系統已自動下載這份資料的CSV備份檔。";
+  }
+}
+
+function renderResults(){
+  const name = $("f-name").value.trim();
+  $("results-subtitle").textContent =
+    `${name || "（未填姓名）"} · 學號：${$("f-student-id").value.trim() || "—"} · 性別：${$("f-gender").value || "—"} · 年齡：${$("f-age").value || "—"} · 班級：${$("f-class").value || "—"} · 裝置：${getDeviceValue() || "—"}`;
+
+  const body = $("results-body");
+  body.innerHTML = "";
+  answers.forEach((a, i) => {
+    const tr = document.createElement("tr");
+    const answerCell = a.text
+      ? escapeHtml(a.text)
+      : `<span class="empty-cell">未作答</span>`;
+    tr.innerHTML = `
+      <td>${i + 1}</td>
+      <td>${answerCell}</td>
+      <td>${a.elapsedMs !== null ? formatElapsed(a.elapsedMs) : "—"}</td>
+    `;
+    body.appendChild(tr);
+  });
+}
+
+function escapeHtml(str){
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function buildExportData(){
+  return {
+    name: $("f-name").value.trim(),
+    studentId: $("f-student-id").value.trim(),
+    gender: $("f-gender").value,
+    age: $("f-age").value,
+    class: $("f-class").value,
+    device: getDeviceValue(),
+    submittedAt: new Date().toISOString(),
+    answers: answers.map((a, i) => ({
+      item: i + 1,
+      answer: a.text,
+      elapsedSeconds: a.elapsedMs !== null ? Math.round(a.elapsedMs / 1000) : null,
+      recordedAt: a.recordedAt
+    }))
+  };
+}
+
+function downloadFile(filename, content, mime){
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function buildCsvContent(data){
+  const header = "姓名,學號,性別,年齡,班級,作答裝置,題號,答案,作答秒數,記錄時間\n";
+  const rows = data.answers.map(a =>
+    [data.name, data.studentId, data.gender, data.age, data.class, `"${data.device.replace(/"/g,'""')}"`, a.item,
+     `"${(a.answer || "").replace(/"/g, '""')}"`,
+     a.elapsedSeconds ?? "", a.recordedAt ?? ""].join(",")
+  ).join("\n");
+  return "\uFEFF" + header + rows;
+}
+
+async function sendToSheet(){
+  $("status-msg").textContent = "資料儲存中，請稍候…";
+  try{
+    const res = await fetch(CONFIG.API_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" }, // 用text/plain避免瀏覽器預檢請求(CORS preflight)被Apps Script擋掉
+      body: JSON.stringify(buildExportData())
+    });
+    const text = await res.text();
+    let json = null;
+    try { json = JSON.parse(text); } catch (e) { /* 不是JSON格式，視為失敗 */ }
+
+    if (json && json.status === "ok"){
+      $("status-msg").textContent = "作答完成，資料已成功保存，感謝您的參與！您可以關閉這個頁面了。";
+    } else {
+      throw new Error("伺服器回應不是預期的成功格式：" + text.slice(0, 300));
+    }
+  } catch(err){
+    console.error("送出資料到Google試算表失敗：", err);
+    // 保險：自動送出失敗時，立刻自動下載一份本機備份，避免資料整個遺失
+    const data = buildExportData();
+    downloadFile(`chopsticks-${data.name || "result"}-backup.csv`, buildCsvContent(data), "text/csv;charset=utf-8");
+    $("status-msg").textContent = "作答完成，但自動保存時發生問題，系統已自動下載一份備份檔案到您的裝置，請協助將這個檔案交給研究人員。感謝您的參與！";
+  }
+}
+</script>
+</body>
+</html>
