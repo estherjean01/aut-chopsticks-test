@@ -332,12 +332,7 @@
       <tbody id="results-body"></tbody>
     </table>
 
-    <div class="actions">
-      <button class="btn-primary" id="btn-download-csv">下載 CSV</button>
-      <button class="btn-secondary" id="btn-download-json">下載 JSON</button>
-      <button class="btn-secondary" id="btn-upload" hidden>送出資料</button>
-    </div>
-    <p class="note" id="upload-note"></p>
+    <p class="note" id="status-msg" style="margin-top:24px; font-size:.95rem;">資料儲存中，請稍候…</p>
   </section>
 
 </div>
@@ -348,9 +343,9 @@
    把 Google Apps Script Web App 的網址貼在下面即可。
    留空就只能用下載 CSV / JSON 的方式保存資料。
    ============================================================ */
-   const CONFIG = {
-     API_ENDPOINT: "https://script.google.com/macros/s/AKfycbwXQc8MHizaGOBXuIKKtyYAQ3L-kPAsKT2RNiA_svDef_hOEguZh9ZXzkDYGP5juW0u/exec"
-   };
+const CONFIG = {
+  API_ENDPOINT: "" // 例如: "https://script.google.com/macros/s/xxxx/exec"
+};
 
 const TOTAL_ITEMS = 22;
 const TEST_SECONDS = 10 * 60;
@@ -537,6 +532,11 @@ function finishTest(){
   show("screen-results");
   if (CONFIG.API_ENDPOINT){
     sendToSheet();
+  } else {
+    // 保險：完全沒設定上傳網址時，至少自動幫他下載一份本機備份
+    const data = buildExportData();
+    downloadFile(`chopsticks-${data.name || "result"}.csv`, buildCsvContent(data), "text/csv;charset=utf-8");
+    $("status-msg").textContent = "作答完成，尚未設定自動保存網址，系統已自動下載這份資料的CSV備份檔。";
   }
 }
 
@@ -559,12 +559,6 @@ function renderResults(){
     `;
     body.appendChild(tr);
   });
-
-  if (CONFIG.API_ENDPOINT){
-    $("btn-upload").hidden = false;
-  } else {
-    $("upload-note").textContent = "尚未設定自動上傳網址，請用「下載 CSV」或「下載 JSON」保存這份資料。";
-  }
 }
 
 function escapeHtml(str){
@@ -601,43 +595,41 @@ function downloadFile(filename, content, mime){
   URL.revokeObjectURL(url);
 }
 
-$("btn-download-json").addEventListener("click", () => {
-  const data = buildExportData();
-  downloadFile(`chopsticks-${data.name || "result"}.json`, JSON.stringify(data, null, 2), "application/json");
-});
-
-$("btn-download-csv").addEventListener("click", () => {
-  const data = buildExportData();
+function buildCsvContent(data){
   const header = "姓名,學號,性別,年齡,班級,作答裝置,題號,答案,作答秒數,記錄時間\n";
   const rows = data.answers.map(a =>
     [data.name, data.studentId, data.gender, data.age, data.class, `"${data.device.replace(/"/g,'""')}"`, a.item,
      `"${(a.answer || "").replace(/"/g, '""')}"`,
      a.elapsedSeconds ?? "", a.recordedAt ?? ""].join(",")
   ).join("\n");
-  downloadFile(`chopsticks-${data.name || "result"}.csv`, "\uFEFF" + header + rows, "text/csv;charset=utf-8");
-});
-
-async function sendToSheet(){
-  const btn = $("btn-upload");
-  btn.disabled = true;
-  btn.textContent = "送出中…";
-  $("upload-note").textContent = "資料上傳中…";
-  try{
-    await fetch(CONFIG.API_ENDPOINT, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify(buildExportData())
-    });
-    $("upload-note").textContent = "資料已自動送出，你可以關閉這個頁面了。";
-  } catch(err){
-    $("upload-note").textContent = "自動送出失敗，請改用下載功能保存資料，或按「重新送出」再試一次。";
-  }
-  btn.disabled = false;
-  btn.textContent = "重新送出";
+  return "\uFEFF" + header + rows;
 }
 
-$("btn-upload").addEventListener("click", () => sendToSheet());
+async function sendToSheet(){
+  $("status-msg").textContent = "資料儲存中，請稍候…";
+  try{
+    const res = await fetch(CONFIG.API_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" }, // 用text/plain避免瀏覽器預檢請求(CORS preflight)被Apps Script擋掉
+      body: JSON.stringify(buildExportData())
+    });
+    const text = await res.text();
+    let json = null;
+    try { json = JSON.parse(text); } catch (e) { /* 不是JSON格式，視為失敗 */ }
+
+    if (json && json.status === "ok"){
+      $("status-msg").textContent = "作答完成，資料已成功保存，感謝您的參與！您可以關閉這個頁面了。";
+    } else {
+      throw new Error("伺服器回應不是預期的成功格式：" + text.slice(0, 300));
+    }
+  } catch(err){
+    console.error("送出資料到Google試算表失敗：", err);
+    // 保險：自動送出失敗時，立刻自動下載一份本機備份，避免資料整個遺失
+    const data = buildExportData();
+    downloadFile(`chopsticks-${data.name || "result"}-backup.csv`, buildCsvContent(data), "text/csv;charset=utf-8");
+    $("status-msg").textContent = "作答完成，但自動保存時發生問題，系統已自動下載一份備份檔案到您的裝置，請協助將這個檔案交給研究人員。感謝您的參與！";
+  }
+}
 </script>
 </body>
 </html>
